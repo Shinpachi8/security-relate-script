@@ -2,16 +2,19 @@
 #coding=utf-8
 
 """
+@version 1.0
+@author shinpachi8
+@describe
 用来对lijiejie的subDomainBrust工具生成的
 txt文件做处理， 即分隔开域名与IP，
 并对域名进行访问，如果是200，保留
 如果是301、302,那么保留跳转后的地址，
 如果是其他的，不管。
+
 """
 
 import re
 import threading
-import time
 import sys
 import argparse
 import logging
@@ -19,7 +22,7 @@ from Queue import Queue
 from requests import head
 
 
-pattern = re.compile(r"(.*\.com)\s*?(.*)")
+pattern = re.compile(r"(.*\.cn|.*\.com)\s*?(.*)")
 lock = threading.Lock()
 url_queue = Queue()
 queue_out = Queue()
@@ -205,35 +208,21 @@ def main():
         threads.append(tt)
 
     for tt in threads:
+        tt.setDaemon(True)
         tt.start()
 
-    for tt in threads:
-        if tt.is_alive():
-            tt.join()
-
-    """
-    如果想中断，那就么使用下边注释的代码
-    """
-
-
-    # for tt in threads:
-    #     tt.setDaemon(True)
-    #     tt.start()
-
-
-
-    # try:
-    #     while True:
-    #         count = 0
-    #         for tt in threads:
-    #             if tt.is_alive():
-    #                 pass
-    #             else:
-    #                 count += 1
-    #         if count == thread:
-    #             break
-    # except KeyboardInterrupt as e:
-    #     logging.info("[-]Oh, U kill ME. U murderer.")
+    try:
+        while True:
+            count = 0
+            for tt in threads:
+                if tt.is_alive():
+                    pass
+                else:
+                    count += 1
+            if count == thread:
+                break
+    except KeyboardInterrupt as e:
+        logging.info("[-]Oh, U kill ME. U murderer.")
 
 
     save_dealed_url(outurl, queue_out)

@@ -9,3 +9,9 @@
 # verity-wydomain
 是对wydoamin这个工具返回的json格式的处理。
 目前是用的单线程，下一版本会改为多线程
+
+
+# crawl_proxy
+这个可以对西刺代理进行爬取，默认爬160页。
+然后用100个线程验证是否正确
+将结果输入到valid_proxy.txt中
