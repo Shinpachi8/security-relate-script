@@ -28,20 +28,23 @@ def xici_crawl():
     }
 
     for page in range(1, 160):
-        html_doc = requests.get('http://www.xici.net.co/nn/' + str(page), headers=headers ).content
-        soup = BeautifulSoup(html_doc)
-        trs = soup.find('table', id='ip_list').find_all('tr')
-        for tr in trs[1:]:
-            tds = tr.find_all('td')
-            ip = tds[1].text.strip()
-            port = tds[2].text.strip()
-            protocol = tds[5].text.strip()
-            if protocol == 'HTTP' or protocol == 'HTTPS':
-                inqueue.put('%s=%s:%s\n' % (protocol, ip, port))
-                # of.write('%s=%s:%s\n' % (protocol, ip, port) )
-                print '%s=%s:%s' % (protocol, ip, port)
+        try:
+            html_doc = requests.get('http://www.xici.net.co/nn/' + str(page), headers=headers ).content
+            soup = BeautifulSoup(html_doc, "lxml")
+            trs = soup.find('table', id='ip_list').find_all('tr')
+            for tr in trs[1:]:
+                tds = tr.find_all('td')
+                ip = tds[1].text.strip()
+                port = tds[2].text.strip()
+                protocol = tds[5].text.strip()
+                if protocol == 'HTTP' or protocol == 'HTTPS':
+                    inqueue.put('%s=%s:%s\n' % (protocol, ip, port))
+                    # of.write('%s=%s:%s\n' % (protocol, ip, port) )
+                    print '%s=%s:%s' % (protocol, ip, port)
+        except Exception as e:
+            break
 
-    of.close()
+    # of.close()
 
 """
 # 这个代理的质量不好
