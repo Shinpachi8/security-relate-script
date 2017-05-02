@@ -56,7 +56,7 @@ class parseTool(object):
         #         print field.tag
     @staticmethod
     def parse_masscan(filename):
-        result = {}
+        result = []
         with open(filename, "r") as f:
             content = f.read()
         soup = bs(content, "lxml")
@@ -73,24 +73,15 @@ class parseTool(object):
             else:
                 name = ""
                 banner = ""
-            if (addr, port["portid"]) in result:
-                name1, banner1 = result[(addr, port["portid"])]
-                if name1 in ["title", ""]:
-                    result[(addr, port["portid"])] = (name, banner.split("\\x0a")[0])
 
-            else:
-                result[(addr, port["portid"])] = (name, banner.split("\\x0a")[0])
-        items = result.items()
-        tmp = [(item[0][0], item[0][1], item[1][0], item[1][1]) for item in items]
-        return tmp
-
+            result.append((addr, port["portid"], name, banner.split("\\x0a")[0]))
+        return result
     @staticmethod
     def parse_nmap(filename):
         with open(filename, "r") as f:
             content = f.read()
         soup = bs(content, "lxml")
         hosts = soup.find_all("host")
-        result = []
         for host in hosts:
             address = host.find("address")["addr"]
             port_open = host.find_all("port")
@@ -108,16 +99,14 @@ class parseTool(object):
                             # if p.find("service").has_attr("servicefp"):
                             #     product = p.find("service")["servicefp"]
                     output_format = "addr: {} \t port: {}\t sevice: {}\t product: {}".format(address, p["portid"], service_name, product)
-                    result.append((address, p["portid"], service_name, product))
+                    print output_format
                     # print p["portid"], p["state"]
-        return result
-
 
 if __name__ == '__main__':
     filename = "nmap_test2.xml"
     masscan = "test2.xml"
     pprint(parseTool.parse_masscan(masscan))
-    pprint(parseTool.parse_nmap(filename))
+    parseTool.parse_nmap(filename)
 
 
 
