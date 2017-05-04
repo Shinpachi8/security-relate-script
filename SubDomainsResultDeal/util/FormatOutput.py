@@ -35,11 +35,17 @@ class FormatOutput(object):
         @output 如果C段数多于10个，那么保留最多的10个，如果少于10个，那么全部保留
         """
         net = {}
+        url_list = []
         if not (os.path.exists(filename) and os.path.isfile(filename)):
             logging.info(Fore.RED + "ip file doesn't exist or it's not a file" + Style.RESET_ALL)
-            return 
+            return
         with open(filename, "r") as f:
-            url_list = json.load(f)
+            try:
+                url_list = json.load(f)
+            except Exception as e:
+                for line in f:
+                    url_list.append(line.strip())
+
             for line in url_list:
                 line = line.strip()
                 logging.info(Fore.RED + line + Style.RESET_ALL)
@@ -69,7 +75,7 @@ class FormatOutput(object):
             for line in result:
                 logging.info(Fore.CYAN + line[0] + suffix + "apper {} times in subDomain Brute result".format(line[1]) + Style.RESET_ALL)
                 f.write(line[0] + suffix + "\n")
-        logging.info(" Done. please ues: " +  Fore.GREEN + "whatweb --input-file={} -v --no-errors --log-xml={}".format(save_file, "your_log_file") + Style.RESET_ALL)  
+        logging.info(" Done. please ues: " +  Fore.GREEN + "whatweb --input-file={} -v --no-errors --log-xml={}".format(save_file, "your_log_file") + Style.RESET_ALL)
         if saveall:
             with open("ipsection.txt", "wb") as f:
                 for line in net:
