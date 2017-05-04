@@ -57,7 +57,7 @@ def main():
         # db.execute("insert myip value ('', '%s', '%s')" % (ip, ip_isp))
         print "ip:{},  isp:{}".format(ip, ip_isp)
     sql = "insert myip value ('', %s, %s)"
-    db.executemany(sql, data)
+    db.executemany(sql, values)
 
 if __name__ == '__main__':
     # getisp("180.76.169.198")
