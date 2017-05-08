@@ -28,11 +28,12 @@ class MysqlTool(object):
 
     def execute(self, sql):
         try:
-            logging.info(sql)
+            # logging.info(sql)
             result = self.cur.execute(sql)
-            for r in self.cur.fetchmany(result):
-                logging.info(r)
+            # for r in self.cur.fetchmany(result):
+            #     logging.info(r)
             self.db.commit()
+            return self.cur.fetchmany(result)
         except Exception, e:
             self.db.rollback()
             raise e
@@ -42,6 +43,8 @@ class MysqlTool(object):
             for r in self.cur.fetchmany(result):
                 logging.info(r)
             self.db.commit()
+            return self.cur.fetchmany(result)
+
         except Exception as e:
             self.db.rollback()
             raise e
@@ -58,7 +61,7 @@ if __name__ == '__main__':
             create table myip(
                 id int unsigned auto_increment primary key,
                 ip varchar(15),
-                isp varchar(30)
+                isp text(50)
                 );
             """
     create_tb2 = """
@@ -68,15 +71,15 @@ if __name__ == '__main__':
                 foreign key (ip_id) references myip (id),
                 port smallint unsigned,
                 name varchar(20),
-                banner varchar(40),
-                http_title varchar(40),
+                banner text(40),
+                http_title text(50),
                 c_time timestamp,
                 u_time timestamp
                 );
             """
-    # db.execute(create_db)
+    db.execute(create_db)
     db.execute("use myipdb;")
-    # db.execute(create_tb1)
+    db.execute(create_tb1)
     db.execute(create_tb2)
 
 
