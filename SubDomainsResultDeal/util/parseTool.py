@@ -35,9 +35,12 @@ class parseTool(object):
     #     "whatweb" : False
     # }
 
-    # @staticmethod
-    # def parse():
-    #     pass
+    @staticmethod
+    def parse(filename):
+        if parseTool.identify_scanner(filename) == "nmap":
+            return parseTool.parse_nmap(filename)
+        elif parseTool.identify_scanner(filename) == "masscan":
+            return parseTool.parse_masscan(filename)
 
     # for now , only identity nmap/masscan
     @staticmethod
