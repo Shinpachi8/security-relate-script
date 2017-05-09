@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 
 """
 inqueue = Queue()
+inqueue_2 = Queue()
 outqueue = Queue()
 
 def xici_crawl():
@@ -71,8 +72,8 @@ def ip84_crawl():
 """
 def test():
 
-    while not inqueue.empty():
-        proxy_line = inqueue.get()
+    while not inqueue_2.empty():
+        proxy_line = inqueue_2.get()
         protocol, proxy = proxy_line.split("=")
         pr = {protocol.lower(): protocol.lower() + "://" + proxy.strip(),}
         # print pr
@@ -91,6 +92,11 @@ def test():
 crawl_time = time.time()
 xici_crawl()
 print "[+] Crawl Proxy Done. Use :\t {} s".format((time.time() - crawl_time) / 1000)
+with open("proxies.txt", "w") as f:
+    while not inqueue.empty():
+        proxy = inqueue.get()
+        f.write(porxy + "\n")
+        inqueue_2.put(proxy)
 
 print "[+] Now Start Test Valid....."
 
