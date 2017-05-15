@@ -26,13 +26,15 @@ class GetTitle(threading.Thread):
         while True:
             if self.port_queue.empty():
                 break
-            ip, port, name, banner = self.port_queue.get()
+            ip, port, name, banner = self.port_queue.get(timeout=3)
             if str(port) == '443':
                 url = "https://{0}:{1}".format(ip, port)
             else:
                 url = "http://{0}:{1}".format(ip, port)
+
             try:
                 #print url
+
                 title = ""
                 res = requests.get(url, headers=headers, allow_redirects=True, timeout=(3,6))
                 matchs = pattern.findall(res.content)[0]

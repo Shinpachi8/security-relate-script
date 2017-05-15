@@ -32,24 +32,34 @@ def rsyncDetect(ip, port=873):
     index = child.expect(["@ERROR", "Password", "\S+\s+", pexpect.EOF, pexpect.TIMEOUT])
     child.logfile_read = sys.stdout
     if index == 0:
-        logging.info(Fore.RED + "{0}::{1} unauth detect failed. REASON: {2}".format(ip, port, str(child.before)) + Style.RESET_ALL)
+        logging.info(Fore.RED + "{0}::{1} unauth detect failed. REASON: {2}".format(ip, port, str(child.after)) + Style.RESET_ALL)
 
     elif index == 1:
-        logging.info(Fore.YELLOW + "{0}::{1} found password".format(ip, port, str(child.before)) + Style.RESET_ALL)
-        child.sendline("admin")
+        logging.info(Fore.YELLOW + "{0}::{1} found password".format(ip, port) + Style.RESET_ALL)
+        child.sendline("rsync")
+        with open("rsync_password.txt", "a") as f:
+            f.write(ip + ":" + str(port) + "\n")
         index = child.expect(['\s+@ERROR', r"\S+\s+\\n", pexpect.EOF, pexpect.TIMEOUT])
         if index == 1:
+            with open("rsync_vu1n.txt", "a") as f:
+                f.write(ip + ":" + str(port) + "\n")
             logging.info("find one")
         else:
             logging.info("not found")
 
     elif index == 2:
+        with open("rsync_vu1n.txt", "a") as f:
+            f.write(ip + ":" + str(port) + "\n")
         logging.info(Fore.GREEN + "{0}::{1} VULNERABLE!!.".format(ip, port) + Style.RESET_ALL)
 
 
 
 if __name__ == '__main__':
-    with open("/Users/jiaxiaoyan/Desktop/tmp/tmp2.txt", "r") as f:
+    if len(sys.argv) != 2:
+        print "python rsync.py filename"
+        exit(0)
+    filename = sys.argv[1]
+    with open(filename, "r") as f:
         for line in f:
             ip = line.strip()
             rsyncDetect(ip)
