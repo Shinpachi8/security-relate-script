@@ -12,7 +12,8 @@ logging.basicConfig(level=logging.INFO,  format='%(asctime)s %(filename)s [line:
 headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0"
     }
-pattern = re.compile(r"<title>(.*)</title>")
+pattern = re.compile(r".*<title>(.*)</title>.*")
+pattern2 = re.compile(r".*<h1>(.*)</h1>.*")
 
 
 class GetTitle(threading.Thread):
@@ -37,11 +38,15 @@ class GetTitle(threading.Thread):
 
                 title = ""
                 res = requests.get(url, headers=headers, allow_redirects=True, timeout=(3,6))
-                matchs = pattern.findall(res.content)[0]
+                matchs = pattern.findall(res.content)
                 if matchs:
-                    title = matchs
+                    title = matchs[0]
                 else:
-                    title = re.content.strip()[:200]
+                    matchs = pattern2.findall(res.content)
+                    if matchs:
+                        title = matchs[0]
+                    else:
+                        title = res.content[:200]
                 self.title_queue.put((ip, port,name, banner, title))
                 logging.info("len(port_queue):{0}\t url:{1}\t title:{2}".format(self.port_queue.qsize(), url, title))
             except KeyboardInterrupt as e:
@@ -49,6 +54,6 @@ class GetTitle(threading.Thread):
                 logging.error(str(e))
             except Exception as e:
                 # print "[-] [Lineno]:84\t\t", str(e)
-                self.title_queue.put((ip, port,name, banner, "#"))
+                self.title_queue.put((ip, port,name, banner, "#E"))
                 # logging.error(str(e))
 

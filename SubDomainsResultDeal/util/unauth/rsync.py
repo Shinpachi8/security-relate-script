@@ -14,13 +14,13 @@ def rsyncDetect(ip, port=873):
     rsync_cmd1 = "rsync {0}::".format(ip)
     child = pexpect.spawn(rsync_cmd1)
     first_line = ""
-    index = child.expect(["@ERROR", "\S+\s.", pexpect.EOF, pexpect.TIMEOUT])
-    if index == 0:
+    index = child.expect(["@ERROR","rsync: " "\S+[a-zA-Z0-9\.\\-_]+", pexpect.EOF, pexpect.TIMEOUT])
+    if index <= 1:
         logging.info(Fore.RED + "{0}::{1} unauth detect failed.".format(ip, port) + Style.RESET_ALL)
-    elif index == 1:
+    elif index == 2:
         first_line = child.after
 
-    elif index == 2:
+    elif index == 3:
         logging.info(Fore.RED + "{0}::{1} no content.".format(ip, port) + Style.RESET_ALL)
     else:
         logging.info(Fore.RED + "{0}::{1} timeout.".format(ip, port) + Style.RESET_ALL)
@@ -28,13 +28,12 @@ def rsyncDetect(ip, port=873):
     rsync_cmd2 = "rsync {0}::{1}".format(ip, first_line)
     print rsync_cmd2
     child = pexpect.spawn(rsync_cmd2)
-
-    index = child.expect(["@ERROR", "Password", "\S+\s+", pexpect.EOF, pexpect.TIMEOUT])
+    index = child.expect(["@ERROR", "rsync: ","Password", "\S+[a-zA-Z0-9\.\\-_]+", pexpect.EOF, pexpect.TIMEOUT])
     child.logfile_read = sys.stdout
-    if index == 0:
+    if index <= 1:
         logging.info(Fore.RED + "{0}::{1} unauth detect failed. REASON: {2}".format(ip, port, str(child.after)) + Style.RESET_ALL)
 
-    elif index == 1:
+    elif index == 2:
         logging.info(Fore.YELLOW + "{0}::{1} found password".format(ip, port) + Style.RESET_ALL)
         child.sendline("rsync")
         with open("rsync_password.txt", "a") as f:
@@ -47,7 +46,7 @@ def rsyncDetect(ip, port=873):
         else:
             logging.info("not found")
 
-    elif index == 2:
+    elif index == 3:
         with open("rsync_vu1n.txt", "a") as f:
             f.write(ip + ":" + str(port) + "\n")
         logging.info(Fore.GREEN + "{0}::{1} VULNERABLE!!.".format(ip, port) + Style.RESET_ALL)
